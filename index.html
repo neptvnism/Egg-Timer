@@ -1,4 +1,4 @@
-<!-- session 4 -->
+<!-- session 4* this is the actual session 4 lol -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,9 +9,10 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #f9f9f9;
             margin: 0;
             padding: 20px;
+            color: #333;
         }
         
         h1 {
@@ -26,60 +27,51 @@
         
         .timer {
             background-color: #fff;
-            padding: 15px;
-            margin-bottom: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .timer:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .timer .header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+            display: none; /* Hidden by default, shown when timer starts */
         }
         
         .timer input[type="text"], .timer input[type="number"] {
             font-size: 1rem;
-            padding: 5px;
+            padding: 8px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .timer button {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1rem;
+            transition: background-color 0.2s;
         }
         
         .timer button:hover {
             background-color: #218838;
-        }
-        
-        .timer .status {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .timer .time {
-            font-size: 1.2rem;
-            color: #333;
-        }
-        
-        #add-timer {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        
-        #add-timer:hover {
-            background-color: #0056b3;
         }
         
         .timer .pause-button {
@@ -97,6 +89,53 @@
         .timer .resume-button:hover {
             background-color: #138496;
         }
+        
+        .timer .status {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .timer .time {
+            font-size: 1.5rem;
+            color: #333;
+        }
+        
+        #add-timer {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        #add-timer:hover {
+            background-color: #0056b3;
+        }
+        
+        @media (max-width: 768px) {
+            #timer-container {
+                width: 90%;
+            }
+            
+            .timer {
+                padding: 15px;
+                margin-bottom: 10px;
+            }
+            
+            .timer input[type="text"], .timer input[type="number"] {
+                font-size: 0.9rem;
+            }
+            
+            .timer button {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -104,6 +143,7 @@
     
     <div id="timer-container">
         <div class="timer">
+            <div class="header"></div>
             <input type="text" placeholder="Timer Name">
             <input type="number" placeholder="Minutes" min="0" max="99">
             <button class="start-button">Start Timer</button>
@@ -122,6 +162,7 @@
             let newTimer = document.createElement('div');
             newTimer.className = 'timer';
             newTimer.innerHTML = `
+                <div class="header"></div>
                 <input type="text" placeholder="Timer Name">
                 <input type="number" placeholder="Minutes" min="0" max="99">
                 <button class="start-button">Start Timer</button>
@@ -154,6 +195,7 @@
             let startButton = timer.querySelector('.start-button');
             let pauseButton = timer.querySelector('.pause-button');
             let resumeButton = timer.querySelector('.resume-button');
+            let header = timer.querySelector('.header');
 
             let minutes = parseInt(inputTime.value) || 0;
             let seconds = 0;
@@ -165,6 +207,12 @@
 
             let totalTime = minutes * 60;
             status.textContent = 'Timer running...';
+
+            // Update header with timer name and minutes
+            header.textContent = `${inputName.value || 'Unnamed Timer'} - ${minutes} minutes`;
+            header.style.display = 'block';
+
+            timer.querySelectorAll('input, button').forEach(el => el.style.display = 'none'); // Hide inputs and buttons
 
             let interval = setInterval(() => {
                 if (totalTime <= 0) {
@@ -219,7 +267,6 @@
                     status.textContent = 'Time is up!';
                     alert(inputName.value + ' Timer finished!');
                     timer.querySelector('.start-button').style.display = 'block';
-                    timer.querySelector('.pause-button').style.display = 'none';
                     resumeButton.style.display = 'none';
                     return;
                 }
@@ -235,25 +282,6 @@
             resumeButton.style.display = 'none';
             timer.querySelector('.pause-button').style.display = 'block';
         }
-
-        // Add event listeners to existing timers
-        document.querySelectorAll('.timer .start-button').forEach(button => {
-            button.addEventListener('click', function() {
-                startTimer(this.parentElement);
-            });
-        });
-
-        document.querySelectorAll('.timer .pause-button').forEach(button => {
-            button.addEventListener('click', function() {
-                pauseTimer(this.parentElement);
-            });
-        });
-
-        document.querySelectorAll('.timer .resume-button').forEach(button => {
-            button.addEventListener('click', function() {
-                resumeTimer(this.parentElement);
-            });
-        });
     </script>
 </body>
 </html>
