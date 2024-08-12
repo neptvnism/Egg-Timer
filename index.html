@@ -1,0 +1,87 @@
+ <!-- session 1 -->
+
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Cooking Timer with Multi-Timers</title>
+     <style>
+         body {
+             font-family: Arial, sans-serif;
+             background-color: #f0f0f0;
+             margin: 0;
+             padding: 20px;
+         }
+
+         h1 {
+             text-align: center;
+             color: #333;
+         }
+
+         #timer-container {
+             max-width: 600px;
+             margin: 0 auto;
+         }
+
+         .timer {
+             background-color: #fff;
+             padding: 15px;
+             margin-bottom: 10px;
+             border-radius: 8px;
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+         }
+
+         .timer input[type="number"] {
+             width: 60px;
+             font-size: 1rem;
+             padding: 5px;
+             border-radius: 5px;
+             border: 1px solid #ccc;
+         }
+
+         .timer button {
+             background-color: #28a745;
+             color: white;
+             border: none;
+             padding: 5px 10px;
+             border-radius: 5px;
+             cursor: pointer;
+             font-size: 1rem;
+         }
+
+         .timer button:hover {
+             background-color: #218838;
+         }
+     </style>
+ </head>
+ <body>
+     <h1>Cooking Timer with Multi-Timers</h1>
+
+     <div id="timer-container">
+         <div class="timer">
+             <input type="number" placeholder="Minutes" min="0" max="99">
+             <button>Start Timer</button>
+         </div>
+     </div>
+
+     <button id="add-timer" style="display: block; margin: 20px auto; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer;">Add Another Timer</button>
+
+     <script>
+         // we'll add more timers when the user clicks the button
+         document.getElementById('add-timer').addEventListener('click', function() {
+             let timerContainer = document.getElementById('timer-container');
+             let newTimer = document.createElement('div');
+             newTimer.className = 'timer';
+             newTimer.innerHTML = `
+                 <input type="number" placeholder="Minutes" min="0" max="99">
+                 <button>Start Timer</button>
+             `;
+             timerContainer.appendChild(newTimer);
+         });
+     </script>
+ </body>
+ </html>
