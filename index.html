@@ -1,4 +1,4 @@
-<!-- session 4* this is the actual session 4 lol -->
+<!-- session 5 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,6 +23,7 @@
         #timer-container {
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
         }
         
         .timer {
@@ -43,11 +44,12 @@
         }
         
         .timer .header {
-            font-size: 1.1rem;
+            font-size: 2rem;
             font-weight: bold;
-            color: #007bff;
+            color: #000;
             margin-bottom: 10px;
-            display: none; /* Hidden by default, shown when timer starts */
+            display: none; 
+            font-family: 'Arial Rounded MT', Arial, sans-serif;
         }
         
         .timer input[type="text"], .timer input[type="number"] {
@@ -117,6 +119,42 @@
             background-color: #0056b3;
         }
         
+        #settings {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        #settings-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        #settings-menu label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #settings-menu select, #settings-menu input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
         @media (max-width: 768px) {
             #timer-container {
                 width: 90%;
@@ -141,6 +179,25 @@
 <body>
     <h1>Cooking Timer with Multi-Timers</h1>
     
+    <button id="settings">⚙️</button>
+    <div id="settings-menu">
+        <label for="font-family">Font Family:</label>
+        <select id="font-family">
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Arial Rounded MT', Arial, sans-serif">Arial Rounded MT</option>
+            <option value="'Courier New', Courier, monospace">Courier New</option>
+            <option value="'Georgia', serif">Georgia</option>
+            <option value="'Times New Roman', Times, serif">Times New Roman</option>
+            <option value="'Trebuchet MS', Helvetica, sans-serif">Trebuchet MS</option>
+            <option value="'Verdana', Geneva, sans-serif">Verdana</option>
+            <option value="'Lucida Console', Monaco, monospace">Lucida Console</option>
+            <option value="'Tahoma', Geneva, sans-serif">Tahoma</option>
+            <option value="'Impact', Charcoal, sans-serif">Impact</option>
+        </select>
+        <label for="font-size">Font Size:</label>
+        <input type="number" id="font-size" min="10" max="30" step="1" value="16">
+    </div>
+
     <div id="timer-container">
         <div class="timer">
             <div class="header"></div>
@@ -157,11 +214,121 @@
     <button id="add-timer">Add Another Timer</button>
 
     <script>
+        document.getElementById('settings').addEventListener('click', function() {
+            let menu = document.getElementById('settings-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.getElementById('font-family').addEventListener('change', function() {
+            document.body.style.fontFamily = this.value;
+        });
+
+        document.getElementById('font-size').addEventListener('input', function() {
+            document.body.style.fontSize = this.value + 'px';
+        });
+
+        function addEventListeners(timer) {
+            timer.querySelector('.start-button').addEventListener('click', function() {
+                startTimer(timer);
+            });
+            timer.querySelector('.pause-button').addEventListener('click', function() {
+                pauseTimer(timer);
+            });
+            timer.querySelector('.resume-button').addEventListener('click', function() {
+                resumeTimer(timer);
+            });
+        }
+
+        function startTimer(timer) {
+            let inputName = timer.querySelector('input[type="text"]');
+            let inputTime = timer.querySelector('input[type="number"]');
+            let timeDisplay = timer.querySelector('.time');
+            let statusDisplay = timer.querySelector('.status');
+            let header = timer.querySelector('.header');
+            let startButton = timer.querySelector('.start-button');
+            let pauseButton = timer.querySelector('.pause-button');
+            let resumeButton = timer.querySelector('.resume-button');
+            let totalTime = parseInt(inputTime.value) * 60;
+
+            if (isNaN(totalTime) || totalTime <= 0) {
+                alert('Please enter a valid number of minutes.');
+                return;
+            }
+
+            header.textContent = `${inputName.value || 'Timer'} - ${inputTime.value} minute(s)`;
+            header.style.display = 'block';
+            inputName.style.display = 'none';
+            inputTime.style.display = 'none';
+            startButton.style.display = 'none';
+
+            let interval = setInterval(() => {
+                if (totalTime <= 0) {
+                    clearInterval(interval);
+                    statusDisplay.textContent = 'Time is up!';
+                    timeDisplay.textContent = '00:00';
+                    pauseButton.style.display = 'none';
+                    resumeButton.style.display = 'none';
+                    return;
+                }
+
+                totalTime--;
+                let minutes = Math.floor(totalTime / 60);
+                let seconds = totalTime % 60;
+
+                timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+
+            timer.dataset.intervalId = interval;
+            pauseButton.style.display = 'block';
+            resumeButton.style.display = 'none';
+        }
+
+        function pauseTimer(timer) {
+            let intervalId = timer.dataset.intervalId;
+            clearInterval(intervalId);
+            timer.querySelector('.pause-button').style.display = 'none';
+            timer.querySelector('.resume-button').style.display = 'block';
+        }
+
+        function resumeTimer(timer) {
+            let inputName = timer.querySelector('input[type="text"]');
+            let inputTime = timer.querySelector('input[type="number"]');
+            let timeDisplay = timer.querySelector('.time');
+            let statusDisplay = timer.querySelector('.status');
+            let resumeButton = timer.querySelector('.resume-button');
+            let totalTime = parseInt(inputTime.value) * 60;
+
+            if (isNaN(totalTime) || totalTime <= 0) {
+                alert('Please enter a valid number of minutes.');
+                return;
+            }
+
+            let interval = setInterval(() => {
+                if (totalTime <= 0) {
+                    clearInterval(interval);
+                    statusDisplay.textContent = 'Time is up!';
+                    timeDisplay.textContent = '00:00';
+                    timer.querySelector('.pause-button').style.display = 'none';
+                    resumeButton.style.display = 'none';
+                    return;
+                }
+
+                totalTime--;
+                let minutes = Math.floor(totalTime / 60);
+                let seconds = totalTime % 60;
+
+                timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+
+            timer.dataset.intervalId = interval;
+            resumeButton.style.display = 'none';
+            timer.querySelector('.pause-button').style.display = 'block';
+        }
+
         document.getElementById('add-timer').addEventListener('click', function() {
-            let timerContainer = document.getElementById('timer-container');
-            let newTimer = document.createElement('div');
-            newTimer.className = 'timer';
-            newTimer.innerHTML = `
+            let timer = document.createElement('div');
+            timer.className = 'timer';
+            timer.innerHTML = `
                 <div class="header"></div>
                 <input type="text" placeholder="Timer Name">
                 <input type="number" placeholder="Minutes" min="0" max="99">
@@ -171,117 +338,13 @@
                 <span class="status"></span>
                 <span class="time">00:00</span>
             `;
-            timerContainer.appendChild(newTimer);
-
-            // Re-add event listeners to new buttons
-            newTimer.querySelector('.start-button').addEventListener('click', function() {
-                startTimer(this.parentElement);
-            });
-            newTimer.querySelector('.pause-button').addEventListener('click', function() {
-                pauseTimer(this.parentElement);
-            });
-            newTimer.querySelector('.resume-button').addEventListener('click', function() {
-                resumeTimer(this.parentElement);
-            });
+            addEventListeners(timer);
+            document.getElementById('timer-container').appendChild(timer);
         });
 
-        let timers = [];
-
-        function startTimer(timer) {
-            let inputName = timer.querySelector('input[type="text"]');
-            let inputTime = timer.querySelector('input[type="number"]');
-            let timeDisplay = timer.querySelector('.time');
-            let status = timer.querySelector('.status');
-            let startButton = timer.querySelector('.start-button');
-            let pauseButton = timer.querySelector('.pause-button');
-            let resumeButton = timer.querySelector('.resume-button');
-            let header = timer.querySelector('.header');
-
-            let minutes = parseInt(inputTime.value) || 0;
-            let seconds = 0;
-
-            if (minutes <= 0) {
-                status.textContent = 'Enter a valid time!';
-                return;
-            }
-
-            let totalTime = minutes * 60;
-            status.textContent = 'Timer running...';
-
-            // Update header with timer name and minutes
-            header.textContent = `${inputName.value || 'Unnamed Timer'} - ${minutes} minutes`;
-            header.style.display = 'block';
-
-            timer.querySelectorAll('input, button').forEach(el => el.style.display = 'none'); // Hide inputs and buttons
-
-            let interval = setInterval(() => {
-                if (totalTime <= 0) {
-                    clearInterval(interval);
-                    timeDisplay.textContent = '00:00';
-                    status.textContent = 'Time is up!';
-                    alert(inputName.value + ' Timer finished!');
-                    startButton.style.display = 'block';
-                    pauseButton.style.display = 'none';
-                    resumeButton.style.display = 'none';
-                    return;
-                }
-
-                totalTime--;
-                minutes = Math.floor(totalTime / 60);
-                seconds = totalTime % 60;
-
-                timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }, 1000);
-
-            timers.push({ timer, interval });
-            startButton.style.display = 'none';
-            pauseButton.style.display = 'block';
-            resumeButton.style.display = 'none';
-        }
-
-        function pauseTimer(timer) {
-            let interval = timers.find(t => t.timer === timer).interval;
-            clearInterval(interval);
-            timer.querySelector('.status').textContent = 'Timer paused';
-            timer.querySelector('.pause-button').style.display = 'none';
-            timer.querySelector('.resume-button').style.display = 'block';
-        }
-
-        function resumeTimer(timer) {
-            let inputName = timer.querySelector('input[type="text"]');
-            let inputTime = timer.querySelector('input[type="number"]');
-            let timeDisplay = timer.querySelector('.time');
-            let status = timer.querySelector('.status');
-            let resumeButton = timer.querySelector('.resume-button');
-
-            let minutes = parseInt(inputTime.value) || 0;
-            let seconds = 0;
-
-            let totalTime = minutes * 60;
-            status.textContent = 'Timer running...';
-
-            let interval = setInterval(() => {
-                if (totalTime <= 0) {
-                    clearInterval(interval);
-                    timeDisplay.textContent = '00:00';
-                    status.textContent = 'Time is up!';
-                    alert(inputName.value + ' Timer finished!');
-                    timer.querySelector('.start-button').style.display = 'block';
-                    resumeButton.style.display = 'none';
-                    return;
-                }
-
-                totalTime--;
-                minutes = Math.floor(totalTime / 60);
-                seconds = totalTime % 60;
-
-                timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }, 1000);
-
-            timers.push({ timer, interval });
-            resumeButton.style.display = 'none';
-            timer.querySelector('.pause-button').style.display = 'block';
-        }
+        // Initialize first timer
+        addEventListeners(document.querySelector('.timer'));
     </script>
 </body>
 </html>
+
