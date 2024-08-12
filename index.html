@@ -1,87 +1,155 @@
- <!-- session 1 -->
+<!-- session 2 -->
 
- <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Cooking Timer with Multi-Timers</title>
-     <style>
-         body {
-             font-family: Arial, sans-serif;
-             background-color: #f0f0f0;
-             margin: 0;
-             padding: 20px;
-         }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Timer with Multi-Timers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        #timer-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .timer {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .timer input[type="number"] {
+            width: 60px;
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        .timer button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .timer button:hover {
+            background-color: #218838;
+        }
+        
+        .timer .status {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .timer .time {
+            font-size: 1.2rem;
+            color: #333;
+            margin-right: 15px;
+        }
+        
+        #add-timer {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        #add-timer:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cooking Timer with Multi-Timers</h1>
+    
+    <div id="timer-container">
+        <div class="timer">
+            <span class="time">00:00</span>
+            <input type="number" placeholder="Minutes" min="0" max="99">
+            <button>Start Timer</button>
+            <span class="status"></span>
+        </div>
+    </div>
+    
+    <button id="add-timer">Add Another Timer</button>
 
-         h1 {
-             text-align: center;
-             color: #333;
-         }
+    <script>
+        document.getElementById('add-timer').addEventListener('click', function() {
+            let timerContainer = document.getElementById('timer-container');
+            let newTimer = document.createElement('div');
+            newTimer.className = 'timer';
+            newTimer.innerHTML = `
+                <span class="time">00:00</span>
+                <input type="number" placeholder="Minutes" min="0" max="99">
+                <button>Start Timer</button>
+                <span class="status"></span>
+            `;
+            timerContainer.appendChild(newTimer);
+        });
 
-         #timer-container {
-             max-width: 600px;
-             margin: 0 auto;
-         }
+        function startTimer(timer) {
+            let input = timer.querySelector('input');
+            let timeDisplay = timer.querySelector('.time');
+            let status = timer.querySelector('.status');
+            let minutes = parseInt(input.value) || 0;
+            let seconds = 0;
 
-         .timer {
-             background-color: #fff;
-             padding: 15px;
-             margin-bottom: 10px;
-             border-radius: 8px;
-             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-             display: flex;
-             justify-content: space-between;
-             align-items: center;
-         }
+            if (minutes <= 0) {
+                status.textContent = 'Enter a valid time!';
+                return;
+            }
 
-         .timer input[type="number"] {
-             width: 60px;
-             font-size: 1rem;
-             padding: 5px;
-             border-radius: 5px;
-             border: 1px solid #ccc;
-         }
+            let totalTime = minutes * 60;
+            status.textContent = 'Timer running...';
 
-         .timer button {
-             background-color: #28a745;
-             color: white;
-             border: none;
-             padding: 5px 10px;
-             border-radius: 5px;
-             cursor: pointer;
-             font-size: 1rem;
-         }
+            let interval = setInterval(() => {
+                if (totalTime <= 0) {
+                    clearInterval(interval);
+                    timeDisplay.textContent = '00:00';
+                    status.textContent = 'Time is up!';
+                    alert('Timer finished!');
+                    return;
+                }
 
-         .timer button:hover {
-             background-color: #218838;
-         }
-     </style>
- </head>
- <body>
-     <h1>Cooking Timer with Multi-Timers</h1>
+                totalTime--;
+                minutes = Math.floor(totalTime / 60);
+                seconds = totalTime % 60;
 
-     <div id="timer-container">
-         <div class="timer">
-             <input type="number" placeholder="Minutes" min="0" max="99">
-             <button>Start Timer</button>
-         </div>
-     </div>
+                timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
 
-     <button id="add-timer" style="display: block; margin: 20px auto; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer;">Add Another Timer</button>
-
-     <script>
-         // we'll add more timers when the user clicks the button
-         document.getElementById('add-timer').addEventListener('click', function() {
-             let timerContainer = document.getElementById('timer-container');
-             let newTimer = document.createElement('div');
-             newTimer.className = 'timer';
-             newTimer.innerHTML = `
-                 <input type="number" placeholder="Minutes" min="0" max="99">
-                 <button>Start Timer</button>
-             `;
-             timerContainer.appendChild(newTimer);
-         });
-     </script>
- </body>
- </html>
+        document.querySelectorAll('.timer button').forEach(button => {
+            button.addEventListener('click', function() {
+                startTimer(this.parentElement);
+            });
+        });
+    </script>
+</body>
+</html>
